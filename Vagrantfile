@@ -25,7 +25,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
   #
-  config.vm.define "postgresql" do
+  config.vm.define "yourfreetree" do
     config.vm.network :forwarded_port, guest: 80, host: 8081
   end
 
@@ -120,7 +120,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ],
   }
 
-  config.vm.define "postgresql" do
+  config.vm.define "yourfreetree" do
 
     config.vm.provision :chef_solo do |chef|
       chef.cookbooks_path = "./cookbooks"
