@@ -27,6 +27,8 @@ if backup_node
   gem_package "backup"
 
   backup_node.each do |app, backup_info|
+    compression_enabled = backup_info.fetch(:compression_enabled, true)
+
     ["/home/#{deploy_user}/Backup", "/home/#{deploy_user}/Backup/models"].each do |path|
       directory path do
         owner deploy_user
@@ -65,7 +67,8 @@ if backup_node
       mode 0600
       owner deploy_user
       group deploy_user
-      variables(app: app, storage: storage, database: database)
+      variables(app: app, storage: storage, database: database,
+                compression_enabled: compression_enabled)
     end
 
     if backup_info[:enabled]
