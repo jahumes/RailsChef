@@ -26,13 +26,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # accessing "localhost:8080" will access port 80 on the guest machine.
   #
   config.vm.define "postgresql" do
-    config.vm.network :forwarded_port, guest: 80, host: 8080
+    config.vm.network :forwarded_port, guest: 80, host: 8081
   end
 
-  config.vm.define "mysql" do
-    config.vm.network :forwarded_port, guest: 80, host: 8081
-    config.vm.network :forwarded_port, guest: 443, host: 4431
-  end
+  # config.vm.define "mysql" do
+  #   config.vm.network :forwarded_port, guest: 80, host: 8081
+  #   config.vm.network :forwarded_port, guest: 443, host: 4431
+  # end
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
@@ -51,7 +51,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # the path on the host to the actual folder. The second argument is
   # the path on the guest to mount the folder. And the optional third
   # argument is a set of non-required options.
-  # config.vm.synced_folder "../intercity-chef-repo", "/intercity-chef-repo"
+  config.vm.synced_folder "../yourfreetree/current", "/home/vagrant/Code/yourfreetree/current"
 
   # Provider-specific configuration so you can fine-tune various
   # backing providers for Vagrant. These expose provider-specific options.
@@ -79,27 +79,35 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         "users" => ["vagrant"]
       }
     },
-    "mysql" => {
-      "server_debian_password" => "a",
-      "server_repl_password" => "a",
-      "server_root_password" => "a"
-    },
-    "postgresql" => {
+    "yourfreetree" => {
       "password" => {
-        "postgres" => "a"
+        "postgres" => "password"
       }
     },
+    'rbenv' => {
+      'user_installs' => [{
+        'user' => 'vagrant',
+        'rubies' => ["2.1.2"],
+        'global'=> "2.1.2",
+        'gems' => {
+        "2.1.2" => [
+            { 'name' => "bundler" }
+        ]
+      }
+    }]
+  },
     "active_applications" => {
-      "intercity_sample_app" => {
+      "yourfreetree" => {
         ruby_version: "2.1.2",
-        domain_names: ["localhost"],
+        domain_names: ["yourfreetree.app","www.yourfreetree.app","vendors.yourfreetree.app","admin.yourfreetree.app"],
         packages: ["nodejs"],
-        rails_env: "staging",
+        rails_env: "development",
+        deploy_user: "vagrant",
         "database_info" => {
           host: "localhost",
-          username: "a",
-          password: "b",
-          database: "intercity_sample_app_production"
+          username: "postgres",
+          password: "password",
+          database: "example_development"
         },
         "env_vars" => {
           "SECRET_KEY_BASE" => "5c11bffd8ad6d537fc291c4b4089a42a2f40ee6869d75490eef944196b3b601053a8d9c2f5c29aa8738fa786f5c14dd5a6fab1b5537095c2c5ed3f2567392463"
@@ -118,34 +126,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       chef.cookbooks_path = "./cookbooks"
       chef.roles_path = "./roles"
 
+      chef.add_role "base"
       chef.add_role "postgresql"
-      chef.add_role "rails_passenger"
-
-      chef.log_level = :info
-
-      if json_payload["active_applications"].size > 0
-        json_payload["active_applications"]["intercity_sample_app"]["database_info"]["adapter"] = "postgresql"
-      end
-
-      # You may also specify custom JSON attributes:
-      chef.json = json_payload
-    end
-
-  end
-
-  config.vm.define "mysql" do
-
-    config.vm.provision :chef_solo do |chef|
-      chef.cookbooks_path = "./cookbooks"
-      chef.roles_path = "./roles"
-
-      chef.add_role "mysql"
       chef.add_role "rails"
 
       chef.log_level = :info
 
       if json_payload["active_applications"].size > 0
-        json_payload["active_applications"]["intercity_sample_app"]["database_info"]["adapter"] = "mysql2"
+        json_payload["active_applications"]["yourfreetree"]["database_info"]["adapter"] = "postgresql"
       end
 
       # You may also specify custom JSON attributes:
@@ -153,5 +141,26 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     end
 
   end
+
+  # config.vm.define "mysql" do
+  #
+  #   config.vm.provision :chef_solo do |chef|
+  #     chef.cookbooks_path = "./cookbooks"
+  #     chef.roles_path = "./roles"
+  #
+  #     chef.add_role "mysql"
+  #     chef.add_role "rails"
+  #
+  #     chef.log_level = :info
+  #
+  #     if json_payload["active_applications"].size > 0
+  #       json_payload["active_applications"]["intercity_sample_app"]["database_info"]["adapter"] = "mysql2"
+  #     end
+  #
+  #     # You may also specify custom JSON attributes:
+  #     chef.json = json_payload
+  #   end
+  #
+  # end
 
 end

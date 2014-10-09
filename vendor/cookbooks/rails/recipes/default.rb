@@ -1,4 +1,4 @@
-#
+ #
 # Cookbook Name:: rails
 # Recipe:: default
 #
@@ -45,7 +45,19 @@ if node[:active_applications]
       owner deploy_user
     end
 
-    ["shared/config",
+    ["current/config",
+     "current/bin",
+     "current/vendor",
+     "current/public",
+     "current/bundle",
+     "current/tmp",
+     "current/tmp/sockets",
+     "current/tmp/cache",
+     "current/tmp/sockets",
+     "current/tmp/pids",
+     "current/log",
+     "current/system",
+     "shared/config",
      "shared/bin",
      "shared/vendor",
      "shared/public",
@@ -75,6 +87,15 @@ if node[:active_applications]
         variables :database_info => app_info['database_info'], :rails_env => rails_env
       end
 
+      template "#{applications_root}/#{app}/current/config/database.yml" do
+        owner deploy_user
+        group deploy_user
+        mode 0600
+        source "app_database.yml.erb"
+        variables :database_info => app_info['database_info'], :rails_env => rails_env
+      end
+
+      
     end
 
     if app_info['ssl_info']
@@ -102,6 +123,12 @@ if node[:active_applications]
     end
 
     template "#{applications_root}/#{app}/shared/config/unicorn.rb" do
+      mode 0644
+      source "app_unicorn.rb.erb"
+      variables :name => app, :deploy_user => deploy_user, :number_of_workers => app_info['number_of_workers'] || 2
+    end
+
+    template "#{applications_root}/#{app}/current/config/unicorn.rb" do
       mode 0644
       source "app_unicorn.rb.erb"
       variables :name => app, :deploy_user => deploy_user, :number_of_workers => app_info['number_of_workers'] || 2

@@ -12,3 +12,4 @@ nodes/*.json
 
 .bundle/install.log
 .bundle
+.idea

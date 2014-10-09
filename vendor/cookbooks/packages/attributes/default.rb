@@ -1,1 +1,1 @@
-default["packages"] = ["libxslt-dev", "libxml2-dev"]
+default["packages"] = ["libxslt-dev", "libxml2-dev", "qt5-qmake"]
