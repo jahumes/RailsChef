@@ -79,7 +79,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         "users" => ["vagrant"]
       }
     },
-    "yourfreetree" => {
+    "postgresql" => {
       "password" => {
         "postgres" => "password"
       }
